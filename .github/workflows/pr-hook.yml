@@ -1,0 +1,10 @@
+name: Send PR message to discord
+
+on:
+  pull_request:
+    types: [opened, unlabeled]
+  
+jobs:
+  notify-discord-on-pr:
+    uses: DEMGroup/.github/.github/workflows/send-pr-to-discord.yml@main
+    secrets: inherit

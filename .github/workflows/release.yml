@@ -1,0 +1,95 @@
+name: Publish, and release Aesir.TradingView
+
+on:
+  workflow_dispatch:
+    inputs:
+      semver:
+        description: "How would you bump the version (semver)? (e.g. major, minor, patch)"
+        required: false
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      skip_prs:
+        description: "Should we skip sending PRs to dependent repos for the version update?"
+        required: false
+        type: boolean
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+env:
+  NUGET_ENABLE_LEGACY_CSPROJ_PACK: true
+
+jobs:
+  bump-version:
+    uses: DEMGroup/.github/.github/workflows/bump-version.yml@main
+    secrets: inherit
+    with:
+      semver: ${{ inputs.semver || 'patch' }}
+
+  build-and-test:
+    uses: ./.github/workflows/build.yml
+
+  release:
+    needs: [build-and-test, bump-version]
+    runs-on: ubuntu-latest
+    env:
+      BUILD_CONFIG: "Release"
+      SOLUTION: "Aesir.TradingView.sln"
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+        with:
+          nuget-version: "latest"
+
+      - name: Setup .NET Core SDK 7.0.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add Github Package Source
+        run: dotnet nuget add source --username DEMGroup --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github.com "https://nuget.pkg.github.com/DEMGroup/index.json"
+
+      - name: Install dependencies
+        run: dotnet restore -r linux-x64
+
+      - name: Build
+        run: dotnet build -v=q --configuration Release /p:Version=${{needs.bump-version.outputs.new_version}}
+
+      # Package the build into a single nupkg/supkg
+      - name: Pack
+        run: nuget pack Aesir.TradingView/Aesir.TradingView.csproj -IncludeReferencedProjects -Properties Configuration=Release -Version ${{needs.bump-version.outputs.new_version}} -OutputDirectory . -Symbols -SymbolPackageFormat snupkg
+
+      - name: Push
+        run: |
+          dotnet nuget push Aesir.TradingView.${{needs.bump-version.outputs.new_version}}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
+
+  create-new-github-release:
+    needs: [release, bump-version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+      - run: git fetch --prune --unshallow --tags
+      - name: Push New Tag (temp manual because actions-ecosystem/action-push-tag@v1 is broken)
+        run: |
+          message='${{needs.bump-version.outputs.new_version_with_v}}: Sha #${{ github.sha }}'
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{needs.bump-version.outputs.new_version_with_v}}" -m "${message}"
+          git push origin "${{needs.bump-version.outputs.new_version_with_v}}"
+          gh release create --generate-notes "${{needs.bump-version.outputs.new_version_with_v}}"
+
+      - name: Add release summary
+        run: |
+          echo '### New version released! :rocket:' >> $GITHUB_STEP_SUMMARY
+          echo 'Version number: ${{needs.bump-version.outputs.new_version_with_v}}' >> $GITHUB_STEP_SUMMARY

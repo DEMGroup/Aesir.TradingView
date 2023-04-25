@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aesir.TradingView", "Aesir.TradingView\Aesir.TradingView.csproj", "{179C3664-FD72-429A-A4D2-5E1109440723}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aesir.TradingView.Sample", "Aesir.TradingView.Sample\Aesir.TradingView.Sample.csproj", "{74924CD5-BA30-485A-99A1-A6FE4D56322D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{179C3664-FD72-429A-A4D2-5E1109440723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{179C3664-FD72-429A-A4D2-5E1109440723}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{179C3664-FD72-429A-A4D2-5E1109440723}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{179C3664-FD72-429A-A4D2-5E1109440723}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74924CD5-BA30-485A-99A1-A6FE4D56322D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74924CD5-BA30-485A-99A1-A6FE4D56322D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74924CD5-BA30-485A-99A1-A6FE4D56322D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74924CD5-BA30-485A-99A1-A6FE4D56322D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
