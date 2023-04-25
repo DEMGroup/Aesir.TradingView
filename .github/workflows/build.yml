@@ -1,4 +1,4 @@
-name: Build and test Paginate
+name: Build and test TradingView
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_call:
 
 jobs:
-  build-paginate:
+  build-tradingview:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
