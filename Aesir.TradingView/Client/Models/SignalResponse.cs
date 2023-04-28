@@ -8,5 +8,5 @@ public class SignalResponse
     public string Symbol { get; set; } = string.Empty;
     
     [JsonPropertyName("d")]
-    public decimal[] Signals { get; set; } = Array.Empty<decimal>();
+    public decimal?[] Signals { get; set; } = Array.Empty<decimal?>();
 }

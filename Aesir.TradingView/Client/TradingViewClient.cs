@@ -33,7 +33,8 @@ public class TradingViewClient
                 new SymbolSignals
                 {
                     Symbol = RemoveBeforeFirstColon(x.Symbol),
-                    Signals = CreateIndicatorDictionary(x.Signals, indicators)
+                    Signals = CreateIndicatorDictionary(x.Signals.Where(z => z.HasValue).Select(z => z!.Value).ToList(),
+                        indicators)
                 }
             )
             .ToArray();
