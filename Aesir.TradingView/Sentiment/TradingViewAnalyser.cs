@@ -46,31 +46,41 @@ public static class TradingViewAnalyser
         IReadOnlyDictionary<string, decimal> indicatorValues)
     {
         var required = Indicators.GetIndicators(indicator).ToArray();
-        var close = indicatorValues[required[0]];
-        var ma = indicatorValues[required[1]];
+        var closeSuccess = indicatorValues.TryGetValue(required[0], out var close);
+        var maSuccess = indicatorValues.TryGetValue(required[1], out var ma);
+        if (!closeSuccess || !maSuccess) return SentimentStrength.Neutral;
         return IndicatorAnalysers.MovingAverage(ma, close);
     }
 
     private static SentimentStrength GetOscillatorRecommendation(Indicator indicator,
         IReadOnlyDictionary<string, decimal> indicatorValues)
-        => Enum.Parse(typeof(Oscillator), indicator.ToString()) switch
+    {
+        const decimal defaultValue = decimal.MinValue;
+        
+        var indicatorName = indicator.ToString();
+        if (!Indicators.IndicatorDependencies.TryGetValue(indicator, out var dependencies)) return SentimentStrength.Neutral;
+        
+        var indicatorArgs = dependencies.Select(dep => indicatorValues.GetValueOrDefault(dep, defaultValue)).ToArray();
+        if (indicatorArgs.Any(x => x is defaultValue)) return SentimentStrength.Neutral;
+        if (indicatorArgs.Length != dependencies.Count) return SentimentStrength.Neutral;
+        
+        return Enum.Parse(typeof(Oscillator), indicatorName) switch
         {
-            Oscillator.ADX => IndicatorAnalysers.Adx(indicatorValues["ADX"], indicatorValues["ADX+DI"],
-                indicatorValues["ADX-DI"], indicatorValues["ADX+DI[1]"], indicatorValues["ADX-DI[1]"]),
-            Oscillator.BBP => IndicatorAnalysers.Simple(indicatorValues["Rec.BBPower"]),
-            Oscillator.AO => IndicatorAnalysers.Ao(indicatorValues["AO"], indicatorValues["AO[1]"],
-                indicatorValues["AO[2]"]),
-            Oscillator.CCI => IndicatorAnalysers.Cci(indicatorValues["CCI20"], indicatorValues["CCI20[1]"]),
-            Oscillator.MACD => IndicatorAnalysers.Macd(indicatorValues["MACD.macd"], indicatorValues["MACD.signal"]),
-            Oscillator.MOM => IndicatorAnalysers.Mom(indicatorValues["Mom"], indicatorValues["Mom[1]"]),
-            Oscillator.RSI => IndicatorAnalysers.Rsi(indicatorValues["RSI"], indicatorValues["RSI[1]"]),
-            Oscillator.Stoch => IndicatorAnalysers.Stoch(indicatorValues["Stoch.K"], indicatorValues["Stoch.D"],
-                indicatorValues["Stoch.K[1]"], indicatorValues["Stoch.D[1]"]),
-            Oscillator.StochRSI => IndicatorAnalysers.Simple(indicatorValues["Rec.Stoch.RSI"]),
-            Oscillator.UO => IndicatorAnalysers.Simple(indicatorValues["Rec.UO"]),
-            Oscillator.WR => IndicatorAnalysers.Simple(indicatorValues["Rec.WR"]),
+            Oscillator.ADX => IndicatorAnalysers.Adx(indicatorArgs[0], indicatorArgs[1], indicatorArgs[2], indicatorArgs[3], indicatorArgs[4]),
+            Oscillator.BBP => IndicatorAnalysers.Simple(indicatorArgs[0]),
+            Oscillator.AO => IndicatorAnalysers.Ao(indicatorArgs[0], indicatorArgs[1], indicatorArgs[2]),
+            Oscillator.CCI => IndicatorAnalysers.Cci(indicatorArgs[0], indicatorArgs[1]),
+            Oscillator.MACD => IndicatorAnalysers.Macd(indicatorArgs[0], indicatorArgs[1]),
+            Oscillator.MOM => IndicatorAnalysers.Mom(indicatorArgs[0], indicatorArgs[1]),
+            Oscillator.RSI => IndicatorAnalysers.Rsi(indicatorArgs[0], indicatorArgs[1]),
+            Oscillator.Stoch => IndicatorAnalysers.Stoch(indicatorArgs[0], indicatorArgs[1], indicatorArgs[2], indicatorArgs[3]),
+            Oscillator.StochRSI => IndicatorAnalysers.Simple(indicatorArgs[0]),
+            Oscillator.UO => IndicatorAnalysers.Simple(indicatorArgs[0]),
+            Oscillator.WR => IndicatorAnalysers.Simple(indicatorArgs[0]),
             _ => 0,
         };
+
+    }
 
     private static Type? CheckEnumType(Indicator val)
     {

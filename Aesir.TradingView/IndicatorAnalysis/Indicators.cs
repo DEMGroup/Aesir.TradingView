@@ -7,11 +7,11 @@ namespace Aesir.TradingView.IndicatorAnalysis;
 /// </summary>
 internal static class Indicators
 {
-    private static readonly Dictionary<Indicator, List<string>> IndicatorDependencies = new ()
+    internal static readonly Dictionary<Indicator, List<string>> IndicatorDependencies = new ()
     {
         { Indicator.ADX, new List<string> { "ADX", "ADX+DI", "ADX-DI", "ADX+DI[1]", "ADX-DI[1]" } },
         { Indicator.AO, new List<string> { "AO", "AO[1]", "AO[2]" } },
-        { Indicator.BBP, new List<string> { "Rec.BBPower", "BBPower" } },
+        { Indicator.BBP, new List<string> { "Rec.BBPower" } },
         { Indicator.CCI, new List<string> { "CCI20", "CCI20[1]" } },
         { Indicator.EMA10, new List<string> { "close", "EMA10" } },
         { Indicator.EMA100, new List<string> { "close", "EMA100" } },

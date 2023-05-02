@@ -28,12 +28,13 @@ public class TradingViewClient
             Columns = indicators.Select(x => $"{x}{interval}")
         };
         var res = await MakeRequest(req);
+
         return res
             .Select(x =>
                 new SymbolSignals
                 {
                     Symbol = RemoveBeforeFirstColon(x.Symbol),
-                    Signals = CreateIndicatorDictionary(x.Signals.Where(z => z.HasValue).Select(z => z!.Value).ToList(),
+                    Signals = CreateIndicatorDictionary(x.Signals.ToList(),
                         indicators)
                 }
             )
@@ -70,7 +71,7 @@ public class TradingViewClient
         _ => throw new ArgumentOutOfRangeException(nameof(interval), interval, null)
     };
 
-    private static Dictionary<string, decimal> CreateIndicatorDictionary(IReadOnlyList<decimal> data,
+    private static Dictionary<string, decimal> CreateIndicatorDictionary(IReadOnlyList<decimal?> data,
         IReadOnlyList<string> indicators)
     {
         if (data.Count != indicators.Count)
@@ -79,7 +80,9 @@ public class TradingViewClient
         var res = new Dictionary<string, decimal>();
         for (var i = 0; i < data.Count; i++)
         {
-            res.Add(indicators[i], data[i]);
+            var val = data[i];
+            if (!val.HasValue) continue;
+            res.Add(indicators[i], val!.Value);
         }
 
         return res;
