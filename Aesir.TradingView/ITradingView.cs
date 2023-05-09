@@ -16,4 +16,10 @@ public interface ITradingView
         Exchange exchange,
         TechnicalAnalysisInterval interval,
         List<Indicator> indicators);
+
+    Task<Dictionary<string, Dictionary<string, decimal>>?> GetAnalysis(
+        IEnumerable<string> tickers,
+        Exchange exchange,
+        TechnicalAnalysisInterval interval,
+        IEnumerable<string> indicators);
 }

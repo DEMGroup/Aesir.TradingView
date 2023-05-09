@@ -68,7 +68,7 @@ public class TradingView : ITradingView
     /// <param name="exchange"></param>
     /// <param name="interval"></param>
     /// <param name="indicators"></param>
-    private async Task<Dictionary<string, Dictionary<string, decimal>>?> GetAnalysis(
+    public async Task<Dictionary<string, Dictionary<string, decimal>>?> GetAnalysis(
         IEnumerable<string> tickers,
         Exchange exchange,
         TechnicalAnalysisInterval interval,
