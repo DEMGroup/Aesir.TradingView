@@ -4,5 +4,6 @@ public enum Exchange
 {
     Binance,
     Coinbase,
-    Kraken
+    Kraken,
+    KuCoin
 }
