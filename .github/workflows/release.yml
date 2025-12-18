@@ -55,21 +55,42 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Add Github Package Source
-        run: dotnet nuget add source --username DEMGroup --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github.com "https://nuget.pkg.github.com/DEMGroup/index.json"
+        run: |
+          dotnet nuget add source \
+            --username DEMGroup \
+            --password ${{ secrets.GITHUB_TOKEN }} \
+            --store-password-in-clear-text \
+            --name github.com "https://nuget.pkg.github.com/DEMGroup/index.json"
 
       - name: Install dependencies
         run: dotnet restore -r linux-x64
 
       - name: Build
-        run: dotnet build -v=q --configuration Release /p:Version=${{needs.bump-version.outputs.new_version}}
+        run: |
+          dotnet build -v=q \
+            --configuration Release \
+            /p:Version=${{needs.bump-version.outputs.new_version}} \
+            /p:PackageVersion=${{needs.bump-version.outputs.new_version}} \
+            --no-restore
 
       # Package the build into a single nupkg/supkg
       - name: Pack
-        run: nuget pack Aesir.TradingView/Aesir.TradingView.csproj -IncludeReferencedProjects -Properties Configuration=Release -Version ${{needs.bump-version.outputs.new_version}} -OutputDirectory . -Symbols -SymbolPackageFormat snupkg
+        run: |
+          dotnet pack \
+            Aesir.TradingView/Aesir.TradingView.csproj \
+            -o . \
+            --include-symbols \
+            -c Release \
+            /p:Version=${{needs.bump-version.outputs.new_version}} \
+            /p:PackageVersion=${{needs.bump-version.outputs.new_version}} \
+            --no-build \
+            --no-restore
 
       - name: Push
         run: |
-          dotnet nuget push Aesir.TradingView.${{needs.bump-version.outputs.new_version}}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
+          dotnet nuget push Aesir.TradingView.${{needs.bump-version.outputs.new_version}}.nupkg \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_TOKEN }}
 
   create-new-github-release:
     needs: [release, bump-version]
