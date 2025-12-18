@@ -21,6 +21,7 @@ on:
 
 env:
   NUGET_ENABLE_LEGACY_CSPROJ_PACK: true
+  DOTNET_VERSION: "10.x"
 
 jobs:
   bump-version:
@@ -41,17 +42,17 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1
         with:
           nuget-version: "latest"
 
-      - name: Setup .NET Core SDK 7.0.x
-        uses: actions/setup-dotnet@v3
+      - name: Setup .NET Core SDK ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Add Github Package Source
         run: dotnet nuget add source --username DEMGroup --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github.com "https://nuget.pkg.github.com/DEMGroup/index.json"
@@ -78,7 +79,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git fetch --prune --unshallow --tags
       - name: Push New Tag (temp manual because actions-ecosystem/action-push-tag@v1 is broken)
         run: |

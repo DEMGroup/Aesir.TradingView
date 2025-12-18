@@ -32,7 +32,7 @@ public class TradingViewClientTests
                 new SignalResponse
                 {
                     Symbol = "BINANCE:BTCUSDT",
-                    Signals = new[] { 500M, 510M }
+                    Signals = new decimal?[] { 500M, 510M }
                 }
             }
         });
@@ -74,7 +74,7 @@ public class TradingViewClientTests
                 new SignalResponse
                 {
                     Symbol = "BINANCE:BTCUSDT",
-                    Signals = new[] { 500M, 510M }
+                    Signals = new decimal?[] { 500M, 510M }
                 }
             }
         });
@@ -100,7 +100,7 @@ public class TradingViewClientTests
                 new SignalResponse
                 {
                     Symbol = "BINANCE:BTCUSDT",
-                    Signals = new[] { 500M, 510M }
+                    Signals = new decimal?[] { 500M, 510M }
                 }
             }
         });
@@ -123,7 +123,7 @@ public class TradingViewClientTests
                 new SignalResponse
                 {
                     Symbol = "BINANCE:BTCUSDT",
-                    Signals = new[] { 500M }
+                    Signals = new decimal?[] { 500M }
                 }
             }
         });
